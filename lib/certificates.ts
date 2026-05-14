@@ -1,25 +1,15 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import type { Certificate } from './types';
 
-function loadCertificates(): Certificate[] {
-  try {
-    // No 'src' folder — data is at project root level
-    const filePath = join(process.cwd(), 'data', 'certificates.json');
-    const raw = readFileSync(filePath, 'utf-8');
-    return JSON.parse(raw) as Certificate[];
-  } catch {
-    return [];
-  }
-}
+// Direct require - most reliable method on Vercel
+// No file system reading needed
+const db: Certificate[] = require('../data/certificates.json');
 
 export function getCertificate(id: string): Certificate | null {
-  const db = loadCertificates();
   return db.find((c) => c.id === id) ?? null;
 }
 
 export function getAllCertificates(): Certificate[] {
-  return loadCertificates();
+  return db;
 }
 
 export function formatDate(iso: string): string {
@@ -37,5 +27,5 @@ export function getComputedStatus(
   if (cert.status === 'revoked') return 'revoked';
   const expiry = new Date(cert.expiryDate);
   if (expiry < new Date()) return 'expired';
-  return 'valid';   // default to valid if status field is missing
+  return 'valid';
 }
