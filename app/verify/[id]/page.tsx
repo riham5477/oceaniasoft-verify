@@ -54,6 +54,28 @@ const CERTIFICATES: Record<string, {
     skills: ["React", "Node.js", "Architecture", "Cloud Migration"],
   },
 
+  "OS-EXP-2026-007": {
+    recipientName:   "Radvin Adiyan Rahil",
+    credentialTitle: "Web Developer",
+    credentialType:  "Full-Time Employment",
+    department:      "Web developer",
+    joiningDate:     "15 March 2024",
+    releaseDate:     "20 May 2027",
+    organization:    "OceaniaSoft Ltd.",
+    employeeId:      "OS-77291",
+    authorizedBy:    "Rabbani Rafi",
+    authorizerRole:  "Chief Executive Officer",
+    certifiedOn:     "21 May 2026",
+    description:     "Rahil was a core member of the Development team, contributing to several high-impact projects. His key responsibilities included leading technical initiatives and delivering quality software solutions.",
+    responsibilities: [
+      "Leading the migration of legacy architecture to Next.js 15.",
+      "Optimizing database queries which reduced latency by 40%.",
+      "Mentoring junior developers and conducting weekly code reviews.",
+      "Collaborating with UI/UX designers to implement accessible components.",
+    ],
+    skills: ["React", "Node.js", "Architecture", "Cloud Migration"],
+  },
+
   // ── ADD MORE CERTIFICATES BELOW ────────────────────────
   // "OS-EXP-2026-004": {
   //   recipientName:   "Jane Smith",
