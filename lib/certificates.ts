@@ -4,9 +4,16 @@ import type { Certificate } from './types';
 
 // This section reads the file manually so Vercel can find it
 const getDb = () => {
-  const filePath = path.join(process.cwd(), 'data', 'certificates.json');
-  const fileData = fs.readFileSync(filePath, 'utf8');
-  return JSON.parse(fileData) as Certificate[];
+  // Use path.resolve to get an absolute path from the root
+  const filePath = path.resolve(process.cwd(), 'data/certificates.json');
+  
+  try {
+    const fileData = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(fileData) as Certificate[];
+  } catch (error) {
+    console.error("Database read error:", error);
+    return []; // Return an empty array if the file is missing
+  }
 };
 
 /**
