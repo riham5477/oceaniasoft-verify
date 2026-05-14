@@ -1,340 +1,260 @@
-import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
 import Link from 'next/link';
-import {
-  BadgeCheck, XCircle, AlertTriangle, Calendar, User, Award,
-  Briefcase, ChevronRight, ArrowLeft, ShieldCheck, Star,
-} from 'lucide-react';
-import { getCertificate, formatDate, getComputedStatus } from '@/lib/certificates';
-import type { Certificate } from '@/lib/types';
+import { BadgeCheck, XCircle, Calendar, User, Award, ArrowLeft, ShieldCheck, Briefcase, Hash } from 'lucide-react';
 
-import { Header } from '../../../components/Header';
-import { Footer } from '../../../components/Footer';
+// ============================================================
+// ★ YOUR CERTIFICATES — ADD / EDIT HERE
+//
+// HOW TO ADD A NEW PERSON:
+//   1. Copy one certificate block (from the opening " to the closing },)
+//   2. Paste it below the last one
+//   3. Change the ID and all the details
+//   4. Save, git add . && git commit -m "add cert" && git push
+//
+// The ID must match the URL:
+//   "OS-EXP-2026-003"  →  yoursite.com/verify/OS-EXP-2026-003
+// ============================================================
+const CERTIFICATES: Record<string, {
+  recipientName: string;
+  credentialTitle: string;
+  credentialType: string;
+  issueDate: string;
+  expiryDate: string;
+  issuerName: string;
+  authorizedBy: string;
+  authorizerRole: string;
+  description: string;
+  responsibilities: string[];
+  skills: string[];
+}> = {
 
-/* ... existing imports ... */
-import { UserCheck, FileText } from 'lucide-react'; // Add these for the new boxes
+  // ── Certificate 1 ──────────────────────────────────────
+  "OS-EXP-2026-003": {
+    recipientName:   "Golam Shareare Reham",
+    credentialTitle: "Web Developer",
+    credentialType:  "Full-Time Employment",
+    issueDate:       "15 March 2024",
+    expiryDate:      "20 May 2027",
+    issuerName:      "OceaniaSoft Ltd.",
+    authorizedBy:    "Rabbani Rafi",
+    authorizerRole:  "Chief Executive Officer",
+    description:     "Reham was a core member of the Development team, contributing to several high-impact projects. His key responsibilities included leading technical initiatives and delivering quality software solutions.",
+    responsibilities: [
+      "Leading the migration of legacy architecture to Next.js 15.",
+      "Optimizing database queries which reduced latency by 40%.",
+      "Mentoring junior developers and conducting weekly code reviews.",
+      "Collaborating with UI/UX designers to implement accessible components.",
+    ],
+    skills: ["React", "Node.js", "Architecture", "Cloud Migration"],
+  },
 
-/* ── Static Metadata (dynamic) ──────────────────────────────────── */
-export async function generateMetadata(
-  { params }: { params: { id: string } }
-): Promise<Metadata> {
-  const cert = getCertificate(params.id);
-  if (!cert) return { title: 'Certificate Not Found' };
-  return {
-    title:       `${cert.recipientName} — ${cert.credentialTitle}`,
-    description: `Verify the experience record of ${cert.recipientName} at Oceaniasoft.`,
-  };
-}
+  // ── ADD MORE CERTIFICATES BELOW ────────────────────────
+  // "OS-EXP-2026-004": {
+  //   recipientName:   "Jane Smith",
+  //   credentialTitle: "UI/UX Designer",
+  //   credentialType:  "Full-Time Employment",
+  //   issueDate:       "01 January 2025",
+  //   expiryDate:      "01 January 2028",
+  //   issuerName:      "OceaniaSoft Ltd.",
+  //   authorizedBy:    "Rabbani Rafi",
+  //   authorizerRole:  "Chief Executive Officer",
+  //   description:     "Jane was a key designer at OceaniaSoft...",
+  //   responsibilities: ["Designing wireframes", "User research"],
+  //   skills: ["Figma", "User Research"],
+  // },
 
-/* ── Page ────────────────────────────────────────────────────────── */
+};
+// ============================================================
+// END — do not edit below unless changing the page design
+// ============================================================
+
+
 export default function VerifyPage({ params }: { params: { id: string } }) {
-  const cert = getCertificate(params.id);
-  const status = cert ? getComputedStatus(cert) : null;
+  const cert = CERTIFICATES[params.id];
 
+  // ── NOT FOUND ─────────────────────────────────────────────
+  if (!cert) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6 pt-20">
+        <div className="w-full max-w-lg bg-[#111827] border border-red-500/20 rounded-2xl p-10 text-center">
+          <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20
+                          flex items-center justify-center mx-auto mb-5">
+            <XCircle size={32} className="text-red-400" strokeWidth={1.5} />
+          </div>
+          <h2 className="font-serif text-2xl font-bold text-white mb-2">Record Not Found</h2>
+          <p className="text-[#8b95a9] text-sm mb-2">No employment record found for ID:</p>
+          <p className="font-mono text-sm text-red-400 bg-red-500/10 border border-red-500/20
+                        inline-block px-4 py-2 rounded-lg mb-6">
+            {params.id}
+          </p>
+          <p className="text-xs text-[#8b95a9] mb-8 max-w-sm mx-auto">
+            Please check the ID and try again, or contact the HR department to confirm the record details.
+          </p>
+          <Link href="/"
+            className="inline-flex items-center gap-2 bg-[#f5a623] text-[#0a0e1a]
+                       font-semibold text-sm px-6 py-3 rounded-xl hover:bg-[#ffc043] transition-all">
+            <ArrowLeft size={14} />
+            Return Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ── CERTIFICATE FOUND ─────────────────────────────────────
   return (
-    <div className="relative min-h-screen pt-28 pb-20">
-
-      {/* Dot-grid background */}
-      <div className="absolute inset-0 bg-dot-grid pointer-events-none opacity-50" />
-
-      {/* Ambient glow */}
-      {status === 'valid' && (
-        <div className="absolute top-40 left-1/2 -translate-x-1/2 w-[600px] h-[300px]
-                        bg-[radial-gradient(ellipse,rgba(245,166,35,0.08)_0%,transparent_70%)]
-                        pointer-events-none" />
-      )}
-
-      <div className="relative max-w-3xl mx-auto px-6">
+    <div className="min-h-screen pt-24 pb-20 px-6">
+      <div className="max-w-2xl mx-auto">
 
         {/* Back link */}
-        <Link href="https://oceaniasoft.com"
-          className="inline-flex items-center gap-1.5 text-xs text-ink-muted hover:text-amber
-                     transition-colors mb-8 group">
+        <Link href="/"
+          className="inline-flex items-center gap-1.5 text-xs text-[#8b95a9]
+                     hover:text-[#f5a623] transition-colors mb-8 group">
           <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to home
         </Link>
 
-        {/* ── Not Found State ─────────────────────────────── */}
-        {!cert && <NotFoundCard id={params.id} />}
-
-        {/* ── Certificate Found ───────────────────────────── */}
-        {cert && status && (
-          <>
-            {/* Status banner */}
-            <StatusBanner status={status} />
-
-            {/* Official credential card */}
-            <CredentialCard cert={cert} status={status} />
-
-            {/* Skills section */}
-            <SkillsSection skills={cert.skills} />
-
-            {/* Footer verification note */}
-            <VerificationNote id={cert.id} />
-          </>
-        )}
-
-      </div>
-    </div>
-  );
-}
-
-/* ── Status Banner ───────────────────────────────────────────────── */
-function StatusBanner({ status }: { status: 'valid' | 'expired' | 'revoked' }) {
-  const config = {
-    valid: {
-      bg:   'bg-emerald-500/10 border-emerald-500/30',
-      text: 'text-emerald-400',
-      icon: <BadgeCheck size={16} strokeWidth={2.5} className="text-emerald-400" />,
-      msg:  'This employment record has been verified and is currently active.',
-    },
-    expired: {
-      bg:   'bg-amber-500/10 border-amber/30',
-      text: 'text-amber',
-      icon: <AlertTriangle size={16} strokeWidth={2.5} className="text-amber" />,
-      msg:  'This record was valid but has now expired or the tenure has ended.',
-    },
-    revoked: {
-      bg:   'bg-red-500/10 border-red-500/30',
-      text: 'text-red-400',
-      icon: <XCircle size={16} strokeWidth={2.5} className="text-red-400" />,
-      msg:  'This record has been revoked and is no longer valid.',
-    },
-  }[status];
-
-  return (
-    <div className={`flex items-center gap-3 px-5 py-3.5 rounded-card border ${config.bg} mb-6`}>
-      {config.icon}
-      <p className={`text-sm font-medium ${config.text}`}>{config.msg}</p>
-    </div>
-  );
-}
-
-/* ── Credential Card ─────────────────────────────────────────────── */
-function CredentialCard({
-  cert, status,
-}: {
-  cert: Certificate;
-  status: 'valid' | 'expired' | 'revoked';
-}) {
-  const statusConfig = {
-    valid: {
-      badgeBg:   'bg-emerald-500/15 border-emerald-500/40',
-      badgeText: 'text-emerald-400',
-      badgeIcon: <BadgeCheck size={14} strokeWidth={2.5} />,
-      badgeLabel:'VERIFIED',
-      headerLine:'from-emerald-500/20 via-transparent',
-    },
-    expired: {
-      badgeBg:   'bg-amber-500/15 border-amber/40',
-      badgeText: 'text-amber',
-      badgeIcon: <AlertTriangle size={14} strokeWidth={2.5} />,
-      badgeLabel:'EXPIRED',
-      headerLine:'from-amber/20 via-transparent',
-    },
-    revoked: {
-      badgeBg:   'bg-red-500/15 border-red-500/40',
-      badgeText: 'text-red-400',
-      badgeIcon: <XCircle size={14} strokeWidth={2.5} />,
-      badgeLabel:'REVOKED',
-      headerLine:'from-red-500/20 via-transparent',
-    },
-  }[status];
-
-  return (
-    <div className="bg-navy-surface border border-navy-border rounded-card-lg overflow-hidden
-                    shadow-card animate-fade-up mb-6">
-
-      {/* Card header bar */}
-      <div className={`h-1.5 bg-gradient-to-r ${statusConfig.headerLine} to-transparent`} />
-
-      {/* Header row */}
-      <div className="px-8 pt-8 pb-6 border-b border-navy-border
-                      flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-card bg-amber-dim border border-amber/20
-                          flex items-center justify-center flex-shrink-0">
-            <ShieldCheck size={26} className="text-amber" strokeWidth={1.75} />
-          </div>
-          <div>
-            <span className="font-display text-lg font-bold text-white">
-              Oceaniasoft<span className="text-amber">.</span>
-            </span>
-            <p className="text-xs text-ink-muted">Experience Verification</p>
-          </div>
-        </div>
-
-        {/* Status badge */}
-        <div className={`
-          inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-xs font-bold
-          tracking-widest uppercase ${statusConfig.badgeBg} ${statusConfig.badgeText}
-        `}>
-          {statusConfig.badgeIcon}
-          {statusConfig.badgeLabel}
-        </div>
-      </div>
-
-      {/* Credential body */}
-      <div className="px-8 py-8">
-
-        {/* Recipient name + title */}
-        <div className="mb-8">
-          <p className="text-xs font-semibold text-amber uppercase tracking-widest mb-1">
-            Certified Professional
-          </p>
-          <h1 className="font-display text-4xl font-bold text-white mb-2 leading-tight">
-            {cert.recipientName}
-          </h1>
-          <p className="text-lg text-ink-muted">
-            {cert.credentialTitle}
+        {/* Verified banner */}
+        <div className="flex items-center gap-3 px-5 py-3.5 rounded-xl
+                        bg-emerald-500/10 border border-emerald-500/30 mb-6">
+          <BadgeCheck size={16} className="text-emerald-400" strokeWidth={2.5} />
+          <p className="text-sm font-medium text-emerald-400">
+            This credential has been verified and is currently active.
           </p>
         </div>
 
-        {/* Description + Responsibilities Block */}
-        {cert.description && (
-          <div className="text-sm text-ink-muted leading-relaxed mb-8 p-6 rounded-card bg-navy border border-navy-border">
-            <p className={cert.responsibilities ? "mb-4" : ""}>
+        {/* Main card */}
+        <div className="bg-[#111827] border border-white/8 rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+
+          {/* Green top accent bar */}
+          <div className="h-1.5 bg-gradient-to-r from-emerald-500/40 via-emerald-500/20 to-transparent" />
+
+          {/* Card header: logo + badge */}
+          <div className="px-8 pt-8 pb-6 border-b border-white/8
+                          flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl bg-[#f5a62326] border border-[#f5a623]/20
+                              flex items-center justify-center flex-shrink-0">
+                <ShieldCheck size={26} className="text-[#f5a623]" strokeWidth={1.75} />
+              </div>
+              <div>
+                {/* ★ LOGO: replace span with <img src="/logo.png" className="h-7 mb-1" /> */}
+                <span className="font-serif text-lg font-bold text-white">
+                  Oceaniasoft<span className="text-[#f5a623]">.</span>
+                </span>
+                <p className="text-xs text-[#8b95a9]">Official Employment Record</p>
+              </div>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full
+                            bg-emerald-500/15 border border-emerald-500/40
+                            text-xs font-bold tracking-widest uppercase text-emerald-400">
+              <BadgeCheck size={14} strokeWidth={2.5} />
+              VERIFIED
+            </div>
+          </div>
+
+          {/* Card body */}
+          <div className="px-8 py-8">
+
+            {/* Recipient */}
+            <div className="mb-8">
+              <p className="text-xs font-semibold text-[#f5a623] uppercase tracking-widest mb-1">
+                This certifies that
+              </p>
+              <h1 className="font-serif text-4xl font-bold text-white mb-2 leading-tight">
+                {cert.recipientName}
+              </h1>
+              <p className="text-lg text-[#8b95a9]">
+                {cert.credentialTitle} — {cert.credentialType}
+              </p>
+            </div>
+
+            {/* Description */}
+            <p className="text-sm text-[#8b95a9] leading-relaxed mb-6 p-4 rounded-xl
+                          bg-[#0a0e1a] border border-white/8">
               {cert.description}
             </p>
-            
-            {cert.responsibilities && cert.responsibilities.length > 0 && (
-              <ul className="space-y-2 list-none">
-                {cert.responsibilities.map((item, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-amber mt-1.5 w-1 h-1 rounded-full bg-amber flex-shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+
+            {/* Responsibilities */}
+            {cert.responsibilities.length > 0 && (
+              <div className="mb-6 p-4 rounded-xl bg-[#0a0e1a] border border-white/8">
+                <p className="text-xs font-semibold text-[#f5a623] uppercase tracking-widest mb-3">
+                  Key Responsibilities
+                </p>
+                <ul className="space-y-2">
+                  {cert.responsibilities.map((r, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-[#8b95a9]">
+                      <span className="text-[#f5a623] mt-1 flex-shrink-0">›</span>
+                      {r}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+              <Detail icon={<Calendar size={15} />}  label="Issue Date"       value={cert.issueDate} />
+              <Detail icon={<Calendar size={15} />}  label="Valid Until"      value={cert.expiryDate} />
+              <Detail icon={<Briefcase size={15} />} label="Issued By"        value={cert.issuerName} />
+              <Detail icon={<User size={15} />}      label="Authorized By"    value={cert.authorizedBy} />
+              <Detail icon={<Award size={15} />}     label="Authorizer Role"  value={cert.authorizerRole} />
+              <Detail icon={<Hash size={15} />}      label="Certificate ID"   value={params.id} mono />
+            </div>
+
+            {/* Skills */}
+            {cert.skills.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-[#f5a623] uppercase tracking-widest mb-3">
+                  Skills &amp; Competencies
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {cert.skills.map((s) => (
+                    <span key={s} className="text-xs font-medium text-[#8b95a9] bg-[#0a0e1a]
+                                             border border-white/8 px-3 py-1.5 rounded-full">
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
-        )}
+        </div>
 
-        {/* Updated Details Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <DetailRow icon={<Briefcase size={15} />} label="Employment Type" value={cert.credentialType} />
-          <DetailRow icon={<User size={15} />}      label="Role"      value={cert.grade} />
-          <DetailRow icon={<Calendar size={15} />}  label="Joining Date"    value={formatDate(cert.issueDate)} />
-          <DetailRow icon={<Calendar size={15} />}  label="Release Date"    value={formatDate(cert.expiryDate)} />
-          <DetailRow icon={<Award size={15} />}     label="Organization"    value={cert.issuerName} />
-          <DetailRow icon={<ShieldCheck size={15} />} label="Employee ID"     value={cert.issuerTitle} />
-          
-          {/* NEW BOXES */}
-          <DetailRow 
-            icon={<UserCheck size={15} />} 
-            label="Authorized By" 
-            value={`${cert.authorizedBy}, ${cert.authorizerRole}`} 
-          />
-          <DetailRow 
-            icon={<FileText size={15} />} 
-            label="Certificate Issue Date" 
-            value={formatDate(cert.certifiedOn || "")} 
-          />
+        {/* Authenticity note */}
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-[#f5a62315]
+                        border border-[#f5a623]/20 mt-5">
+          <ShieldCheck size={16} className="text-[#f5a623] flex-shrink-0 mt-0.5" strokeWidth={1.75} />
+          <p className="text-xs text-[#8b95a9] leading-relaxed">
+            This record was issued and is maintained by OceaniaSoft Ltd. Certificate ID{' '}
+            <span className="font-mono text-[#f5a623]">{params.id}</span> is unique.
+            For enquiries contact{' '}
+            <a href="mailto:hello@oceaniasoft.com" className="text-[#f5a623] hover:underline">
+              hello@oceaniasoft.com
+            </a>
+          </p>
         </div>
-        {/* Certificate ID */}
-        <div className="mt-6 flex items-center justify-between p-4 rounded-card
-                        bg-navy border border-navy-border">
-          <div>
-            <p className="text-xs text-ink-muted uppercase tracking-widest mb-0.5">Verification ID</p>
-            <p className="font-mono text-sm text-amber font-medium">{cert.id}</p>
-          </div>
-          <ChevronRight size={16} className="text-ink-muted" />
-        </div>
+
       </div>
     </div>
   );
 }
 
-/* ── Detail Row ──────────────────────────────────────────────────── */
-function DetailRow({
-  icon, label, value,
-}: {
-  icon: React.ReactNode; label: string; value: string;
+// ── Detail row helper ──────────────────────────────────────────────
+function Detail({ icon, label, value, mono = false }: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  mono?: boolean;
 }) {
   return (
-    <div className="flex items-start gap-3 p-4 rounded-card bg-navy border border-navy-border">
-      <span className="text-amber mt-0.5 flex-shrink-0">{icon}</span>
+    <div className="flex items-start gap-3 p-3.5 rounded-xl bg-[#0a0e1a] border border-white/8">
+      <span className="text-[#f5a623] mt-0.5 flex-shrink-0">{icon}</span>
       <div>
-        <p className="text-xs text-ink-muted uppercase tracking-wide mb-0.5">{label}</p>
-        <p className="text-sm font-medium text-ink">{value}</p>
-      </div>
-    </div>
-  );
-}
-
-/* ── Skills Section ──────────────────────────────────────────────── */
-function SkillsSection({ skills }: { skills: string[] }) {
-  if (!skills || !skills.length) return null;
-  return (
-    <div className="bg-navy-surface border border-navy-border rounded-card-lg px-8 py-6 mb-6
-                    animate-fade-up" style={{ animationDelay: '0.1s' }}>
-      <p className="text-xs font-semibold text-amber uppercase tracking-widest mb-4">
-        Core Competencies
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {skills.map((s) => (
-          <span key={s}
-            className="text-xs font-medium text-ink-muted bg-navy border border-navy-border
-                       px-3 py-1.5 rounded-full hover:border-amber hover:text-amber
-                       transition-colors cursor-default">
-            {s}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ── Verification Note ───────────────────────────────────────────── */
-function VerificationNote({ id }: { id: string }) {
-  return (
-    <div className="flex items-start gap-3 p-5 rounded-card bg-amber-dim border border-amber/20
-                    animate-fade-up" style={{ animationDelay: '0.2s' }}>
-      <ShieldCheck size={18} className="text-amber flex-shrink-0 mt-0.5" strokeWidth={1.75} />
-      <div>
-        <p className="text-xs font-semibold text-amber mb-1">Authenticity Notice</p>
-        <p className="text-xs text-ink-muted leading-relaxed">
-          This digital record is maintained by Oceaniasoft Ltd. The verification ID{' '}
-          <span className="font-mono text-amber">{id}</span> is unique and tamper-evident.
-          For enquiries, contact{' '}
-          <a href="mailto:hello@oceaniasoft.com"
-            className="text-amber hover:underline">hello@oceaniasoft.com</a>.
+        <p className="text-xs text-[#8b95a9] uppercase tracking-wide mb-0.5">{label}</p>
+        <p className={`text-sm font-medium text-white ${mono ? 'font-mono text-[#f5a623]' : ''}`}>
+          {value}
         </p>
       </div>
-    </div>
-  );
-}
-
-/* ── Not Found Card ──────────────────────────────────────────────── */
-function NotFoundCard({ id }: { id: string }) {
-  return (
-    <div className="bg-navy-surface border border-red-500/20 rounded-card-lg p-10 text-center
-                    animate-fade-up">
-      <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center
-                      justify-center mx-auto mb-5">
-        <XCircle size={32} className="text-red-400" strokeWidth={1.5} />
-      </div>
-      <h2 className="font-display text-2xl font-bold text-white mb-2">
-        Record Not Found
-      </h2>
-      <p className="text-ink-muted text-sm mb-2">
-        No employment record found for ID:
-      </p>
-      <p className="font-mono text-sm text-red-400 bg-red-500/10 border border-red-500/20
-                    inline-block px-4 py-2 rounded-card mb-6">
-        {id}
-      </p>
-      <p className="text-xs text-ink-muted mb-8 max-w-sm mx-auto">
-        Please check the ID and try again, or contact the HR department to confirm the
-        record details.
-      </p>
-      <Link href="https://oceaniasoft.com"
-        className="inline-flex items-center gap-2 bg-amber text-navy font-semibold text-sm
-                   px-6 py-3 rounded-card hover:bg-amber-light transition-all duration-200
-                   hover:-translate-y-0.5 hover:shadow-amber">
-        <ArrowLeft size={14} />
-        Return Home
-      </Link>
     </div>
   );
 }
