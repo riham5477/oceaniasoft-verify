@@ -14,8 +14,12 @@ const getDb = () => {
  * Returns the certificate if found, or null otherwise.
  */
 export function getCertificate(id: string): Certificate | null {
-  const db = getDb(); // Refresh the data from the file
-  return db.find((c) => c.id === id) ?? null;
+  const db = getDb();
+  
+  // This makes the search much more reliable
+  return db.find((c) => 
+    c.id.trim().toLowerCase() === id.trim().toLowerCase()
+  ) ?? null;
 }
 
 /**
