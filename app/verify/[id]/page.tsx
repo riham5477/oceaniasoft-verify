@@ -36,7 +36,7 @@ const CERTIFICATES: Record<string, {
     recipientName:   "Golam Shareare Reham",
     credentialTitle: "Web Developer",
     credentialType:  "Full-Time Employment",
-    department:      "Engineering",
+    department:      "Web developer",
     joiningDate:     "15 March 2024",
     releaseDate:     "20 May 2027",
     organization:    "OceaniaSoft Ltd.",
@@ -125,7 +125,7 @@ export default async function VerifyPage({
       <div className="relative max-w-2xl mx-auto">
 
         {/* Back link */}
-        <Link href="/"
+        <Link href="https://www.oceaniasoft.com/"
           className="inline-flex items-center gap-1.5 text-xs text-[#8b95a9]
                      hover:text-[#f5a623] transition-colors mb-8 group">
           <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
@@ -221,7 +221,7 @@ export default async function VerifyPage({
               />
               <DetailRow
                 icon={<User size={15} />}
-                label="Department"
+                label="Role"
                 value={cert.department}
               />
               <DetailRow
