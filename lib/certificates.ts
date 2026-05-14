@@ -1,14 +1,20 @@
-import certificates from '../data/certificates.json';
+import fs from 'fs';
+import path from 'path';
 import type { Certificate } from './types';
 
-// Cast the JSON data to the typed array
-const db = certificates as Certificate[];
+// This section reads the file manually so Vercel can find it
+const getDb = () => {
+  const filePath = path.join(process.cwd(), 'data', 'certificates.json');
+  const fileData = fs.readFileSync(filePath, 'utf8');
+  return JSON.parse(fileData) as Certificate[];
+};
 
 /**
  * Look up a certificate by its unique ID.
  * Returns the certificate if found, or null otherwise.
  */
 export function getCertificate(id: string): Certificate | null {
+  const db = getDb(); // Refresh the data from the file
   return db.find((c) => c.id === id) ?? null;
 }
 
@@ -16,7 +22,7 @@ export function getCertificate(id: string): Certificate | null {
  * Return all certificates (used in the admin panel).
  */
 export function getAllCertificates(): Certificate[] {
-  return db;
+  return getDb();
 }
 
 /**
