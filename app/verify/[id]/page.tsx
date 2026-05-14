@@ -103,7 +103,7 @@ export default async function VerifyPage({
           <p className="text-xs text-[#8b95a9] mb-8 max-w-sm mx-auto">
             Please check the ID and try again, or contact the HR department to confirm the record details.
           </p>
-          <Link href="/"
+          <Link href="https://oceaniasoft.com"
             className="inline-flex items-center gap-2 bg-[#f5a623] text-[#0a0e1a]
                        font-semibold text-sm px-6 py-3 rounded-xl hover:bg-[#ffc043] transition-all">
             <ArrowLeft size={14} />
@@ -162,7 +162,7 @@ export default async function VerifyPage({
                 <p className="font-serif text-xl font-bold text-white leading-none mb-1">
                   Oceaniasoft<span className="text-[#f5a623]">.</span>
                 </p>
-                <p className="text-xs text-[#8b95a9]">Official Employment Record</p>
+                <p className="text-xs text-[#8b95a9]">Official Credential</p>
               </div>
             </div>
 
@@ -182,7 +182,7 @@ export default async function VerifyPage({
             {/* Recipient name + title */}
             <div className="mb-8">
               <p className="text-xs font-semibold text-[#f5a623] uppercase tracking-widest mb-2">
-                This certifies that
+                Awarded to
               </p>
               <h1 className="font-serif text-4xl md:text-5xl font-bold text-white leading-tight mb-3">
                 {cert.recipientName}
