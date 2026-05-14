@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getCertificate } from '@/lib/certificates';
-import type { VerifyResponse } from '@/lib/types';
+import { getCertificate } from '../../../../lib/certificates';
+import type { VerifyResponse } from '../../../../lib/types';
 
 export async function GET(
   _request: Request,
