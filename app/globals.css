@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Google Fonts ─────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Playfair+Display:wght@700;800&display=swap');
+
+/* ── Base ─────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-navy text-ink font-body antialiased overflow-x-hidden;
+  }
+
+  /* Remove default input autofill background in WebKit */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #111827 inset !important;
+    -webkit-text-fill-color: #e8ecf4 !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
+
+/* ── Component helpers ────────────────────────────────────────── */
+@layer components {
+
+  /* Dot-grid background pattern (hero sections) */
+  .bg-dot-grid {
+    background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Amber horizontal rule accent */
+  .section-accent-line::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, transparent, #f5a623, transparent);
+    margin: 0 auto 48px;
+  }
+
+  /* Card hover-lift base */
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+  .card-hover:hover {
+    @apply -translate-y-1.5 shadow-lift;
+  }
+
+  /* Amber shimmer loading bar */
+  .shimmer-bar {
+    background: linear-gradient(
+      90deg,
+      #1a2236 25%,
+      #f5a62333 50%,
+      #1a2236 75%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer rounded;
+  }
+
+  /* Form input base */
+  .form-input {
+    @apply w-full bg-navy border border-navy-border rounded-card px-4 py-3
+           text-ink text-sm placeholder-ink-muted
+           focus:outline-none focus:ring-2 focus:ring-amber/50 focus:border-amber
+           transition-all duration-200;
+  }
+
+  /* Label */
+  .form-label {
+    @apply block text-xs font-semibold tracking-wide text-ink mb-2 uppercase;
+  }
+}

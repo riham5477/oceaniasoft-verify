@@ -1,0 +1,24 @@
+[
+  {
+    "id": "OS-EXP-2026-003",
+    "recipientName": "Golam Shareare Reham",
+    "credentialTitle": "Web Developer",
+    "description": "Reham was a core member of the Development team, contributing to several high-impact projects. His key responsibilities included:",
+    "responsibilities": [
+      "Leading the migration of legacy architecture to Next.js 15.",
+      "Optimizing database queries which reduced latency by 40%.",
+      "Mentoring junior developers and conducting weekly code reviews.",
+      "Collaborating with UI/UX designers to implement accessible components."
+    ],
+    "credentialType": "Full-Time",
+    "grade": "Web Developer",
+    "issueDate": "2024-03-15",
+    "expiryDate": "2026-05-20",
+    "issuerName": "OceaniaSoft Ltd.",
+    "issuerTitle": "OS-77291",
+    "authorizedBy": "Rabbani Rafi",
+    "authorizerRole": "Chief Executive Officer",
+    "certifiedOn": "2026-05-21",
+    "skills": ["React", "Node.js", "Architecture", "Cloud Migration"]
+  }
+]
