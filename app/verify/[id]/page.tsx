@@ -5,10 +5,10 @@ import { BadgeCheck, XCircle, Calendar, User, Award, ArrowLeft, ShieldCheck, Bri
 // ★ YOUR CERTIFICATES — ADD / EDIT HERE
 //
 // HOW TO ADD A NEW PERSON:
-//   1. Copy one certificate block (from the opening " to the closing },)
+//   1. Copy one certificate block
 //   2. Paste it below the last one
 //   3. Change the ID and all the details
-//   4. Save, git add . && git commit -m "add cert" && git push
+//   4. Save, then: git add . && git commit -m "add cert" && git push
 //
 // The ID must match the URL:
 //   "OS-EXP-2026-003"  →  yoursite.com/verify/OS-EXP-2026-003
@@ -51,25 +51,21 @@ const CERTIFICATES: Record<string, {
   // "OS-EXP-2026-004": {
   //   recipientName:   "Jane Smith",
   //   credentialTitle: "UI/UX Designer",
-  //   credentialType:  "Full-Time Employment",
-  //   issueDate:       "01 January 2025",
-  //   expiryDate:      "01 January 2028",
-  //   issuerName:      "OceaniaSoft Ltd.",
-  //   authorizedBy:    "Rabbani Rafi",
-  //   authorizerRole:  "Chief Executive Officer",
-  //   description:     "Jane was a key designer at OceaniaSoft...",
-  //   responsibilities: ["Designing wireframes", "User research"],
-  //   skills: ["Figma", "User Research"],
+  //   ...
   // },
 
 };
 // ============================================================
-// END — do not edit below unless changing the page design
-// ============================================================
 
 
-export default function VerifyPage({ params }: { params: { id: string } }) {
-  const cert = CERTIFICATES[params.id];
+// ★ Next.js 15: params must be a Promise — this is the fix
+export default async function VerifyPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const cert = CERTIFICATES[id];
 
   // ── NOT FOUND ─────────────────────────────────────────────
   if (!cert) {
@@ -84,7 +80,7 @@ export default function VerifyPage({ params }: { params: { id: string } }) {
           <p className="text-[#8b95a9] text-sm mb-2">No employment record found for ID:</p>
           <p className="font-mono text-sm text-red-400 bg-red-500/10 border border-red-500/20
                         inline-block px-4 py-2 rounded-lg mb-6">
-            {params.id}
+            {id}
           </p>
           <p className="text-xs text-[#8b95a9] mb-8 max-w-sm mx-auto">
             Please check the ID and try again, or contact the HR department to confirm the record details.
@@ -123,12 +119,13 @@ export default function VerifyPage({ params }: { params: { id: string } }) {
         </div>
 
         {/* Main card */}
-        <div className="bg-[#111827] border border-white/8 rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+        <div className="bg-[#111827] border border-white/8 rounded-2xl overflow-hidden
+                        shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
 
           {/* Green top accent bar */}
           <div className="h-1.5 bg-gradient-to-r from-emerald-500/40 via-emerald-500/20 to-transparent" />
 
-          {/* Card header: logo + badge */}
+          {/* Card header */}
           <div className="px-8 pt-8 pb-6 border-b border-white/8
                           flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -155,7 +152,7 @@ export default function VerifyPage({ params }: { params: { id: string } }) {
           {/* Card body */}
           <div className="px-8 py-8">
 
-            {/* Recipient */}
+            {/* Recipient name */}
             <div className="mb-8">
               <p className="text-xs font-semibold text-[#f5a623] uppercase tracking-widest mb-1">
                 This certifies that
@@ -191,14 +188,14 @@ export default function VerifyPage({ params }: { params: { id: string } }) {
               </div>
             )}
 
-            {/* Details */}
+            {/* Details grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-              <Detail icon={<Calendar size={15} />}  label="Issue Date"       value={cert.issueDate} />
-              <Detail icon={<Calendar size={15} />}  label="Valid Until"      value={cert.expiryDate} />
-              <Detail icon={<Briefcase size={15} />} label="Issued By"        value={cert.issuerName} />
-              <Detail icon={<User size={15} />}      label="Authorized By"    value={cert.authorizedBy} />
-              <Detail icon={<Award size={15} />}     label="Authorizer Role"  value={cert.authorizerRole} />
-              <Detail icon={<Hash size={15} />}      label="Certificate ID"   value={params.id} mono />
+              <Detail icon={<Calendar size={15} />}  label="Issue Date"      value={cert.issueDate} />
+              <Detail icon={<Calendar size={15} />}  label="Valid Until"     value={cert.expiryDate} />
+              <Detail icon={<Briefcase size={15} />} label="Issued By"       value={cert.issuerName} />
+              <Detail icon={<User size={15} />}      label="Authorized By"   value={cert.authorizedBy} />
+              <Detail icon={<Award size={15} />}     label="Authorizer Role" value={cert.authorizerRole} />
+              <Detail icon={<Hash size={15} />}      label="Certificate ID"  value={id} mono />
             </div>
 
             {/* Skills */}
@@ -209,8 +206,9 @@ export default function VerifyPage({ params }: { params: { id: string } }) {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {cert.skills.map((s) => (
-                    <span key={s} className="text-xs font-medium text-[#8b95a9] bg-[#0a0e1a]
-                                             border border-white/8 px-3 py-1.5 rounded-full">
+                    <span key={s}
+                      className="text-xs font-medium text-[#8b95a9] bg-[#0a0e1a]
+                                 border border-white/8 px-3 py-1.5 rounded-full">
                       {s}
                     </span>
                   ))}
@@ -226,7 +224,7 @@ export default function VerifyPage({ params }: { params: { id: string } }) {
           <ShieldCheck size={16} className="text-[#f5a623] flex-shrink-0 mt-0.5" strokeWidth={1.75} />
           <p className="text-xs text-[#8b95a9] leading-relaxed">
             This record was issued and is maintained by OceaniaSoft Ltd. Certificate ID{' '}
-            <span className="font-mono text-[#f5a623]">{params.id}</span> is unique.
+            <span className="font-mono text-[#f5a623]">{id}</span> is unique.
             For enquiries contact{' '}
             <a href="mailto:hello@oceaniasoft.com" className="text-[#f5a623] hover:underline">
               hello@oceaniasoft.com
