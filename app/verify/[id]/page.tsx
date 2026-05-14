@@ -1,30 +1,34 @@
 import Link from 'next/link';
-import { BadgeCheck, XCircle, Calendar, User, Award, ArrowLeft, ShieldCheck, Briefcase, Hash } from 'lucide-react';
+import {
+  BadgeCheck, XCircle, Calendar, User, Award,
+  ArrowLeft, ShieldCheck, Briefcase, UserCheck, FileText
+} from 'lucide-react';
 
 // ============================================================
 // ★ YOUR CERTIFICATES — ADD / EDIT HERE
 //
 // HOW TO ADD A NEW PERSON:
 //   1. Copy one certificate block
-//   2. Paste it below the last one
-//   3. Change the ID and all the details
-//   4. Save, then: git add . && git commit -m "add cert" && git push
+//   2. Paste it below the last one, change the ID + details
+//   3. git add . && git commit -m "add cert" && git push
 //
-// The ID must match the URL:
-//   "OS-EXP-2026-003"  →  yoursite.com/verify/OS-EXP-2026-003
+// URL pattern:  yoursite.com/verify/OS-EXP-2026-003
 // ============================================================
 const CERTIFICATES: Record<string, {
-  recipientName: string;
+  recipientName:   string;
   credentialTitle: string;
-  credentialType: string;
-  issueDate: string;
-  expiryDate: string;
-  issuerName: string;
-  authorizedBy: string;
-  authorizerRole: string;
-  description: string;
+  credentialType:  string;   // Employment Type
+  department:      string;   // Department
+  joiningDate:     string;   // e.g. "15 March 2024"
+  releaseDate:     string;   // e.g. "20 May 2027"
+  organization:    string;   // Organization name
+  employeeId:      string;   // Employee ID
+  authorizedBy:    string;   // Authorizer name
+  authorizerRole:  string;   // Authorizer role/title
+  certifiedOn:     string;   // Certificate issue date e.g. "21 May 2026"
+  description:     string;
   responsibilities: string[];
-  skills: string[];
+  skills:          string[];
 }> = {
 
   // ── Certificate 1 ──────────────────────────────────────
@@ -32,11 +36,14 @@ const CERTIFICATES: Record<string, {
     recipientName:   "Golam Shareare Reham",
     credentialTitle: "Web Developer",
     credentialType:  "Full-Time Employment",
-    issueDate:       "15 March 2024",
-    expiryDate:      "20 May 2027",
-    issuerName:      "OceaniaSoft Ltd.",
+    department:      "Engineering",
+    joiningDate:     "15 March 2024",
+    releaseDate:     "20 May 2027",
+    organization:    "OceaniaSoft Ltd.",
+    employeeId:      "OS-77291",
     authorizedBy:    "Rabbani Rafi",
     authorizerRole:  "Chief Executive Officer",
+    certifiedOn:     "21 May 2026",
     description:     "Reham was a core member of the Development team, contributing to several high-impact projects. His key responsibilities included leading technical initiatives and delivering quality software solutions.",
     responsibilities: [
       "Leading the migration of legacy architecture to Next.js 15.",
@@ -51,14 +58,25 @@ const CERTIFICATES: Record<string, {
   // "OS-EXP-2026-004": {
   //   recipientName:   "Jane Smith",
   //   credentialTitle: "UI/UX Designer",
-  //   ...
+  //   credentialType:  "Full-Time Employment",
+  //   department:      "Design",
+  //   joiningDate:     "01 January 2025",
+  //   releaseDate:     "01 January 2028",
+  //   organization:    "OceaniaSoft Ltd.",
+  //   employeeId:      "OS-77292",
+  //   authorizedBy:    "Rabbani Rafi",
+  //   authorizerRole:  "Chief Executive Officer",
+  //   certifiedOn:     "01 January 2025",
+  //   description:     "Jane was a key designer...",
+  //   responsibilities: ["Designed wireframes", "Led user research"],
+  //   skills: ["Figma", "User Research"],
   // },
 
 };
 // ============================================================
 
 
-// ★ Next.js 15: params must be a Promise — this is the fix
+// ★ Next.js 15: params is a Promise — must be awaited
 export default async function VerifyPage({
   params,
 }: {
@@ -99,7 +117,12 @@ export default async function VerifyPage({
   // ── CERTIFICATE FOUND ─────────────────────────────────────
   return (
     <div className="min-h-screen pt-24 pb-20 px-6">
-      <div className="max-w-2xl mx-auto">
+
+      {/* Subtle amber glow behind the card */}
+      <div className="fixed top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] pointer-events-none
+                      bg-[radial-gradient(ellipse,rgba(245,166,35,0.05)_0%,transparent_70%)]" />
+
+      <div className="relative max-w-2xl mx-auto">
 
         {/* Back link */}
         <Link href="/"
@@ -109,7 +132,7 @@ export default async function VerifyPage({
           Back to home
         </Link>
 
-        {/* Verified banner */}
+        {/* ── Verified status banner ───────────────────────── */}
         <div className="flex items-center gap-3 px-5 py-3.5 rounded-xl
                         bg-emerald-500/10 border border-emerald-500/30 mb-6">
           <BadgeCheck size={16} className="text-emerald-400" strokeWidth={2.5} />
@@ -118,84 +141,119 @@ export default async function VerifyPage({
           </p>
         </div>
 
-        {/* Main card */}
+        {/* ── Main credential card ─────────────────────────── */}
         <div className="bg-[#111827] border border-white/8 rounded-2xl overflow-hidden
-                        shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+                        shadow-[0_8px_40px_rgba(0,0,0,0.4)]">
 
-          {/* Green top accent bar */}
-          <div className="h-1.5 bg-gradient-to-r from-emerald-500/40 via-emerald-500/20 to-transparent" />
+          {/* Emerald top accent bar */}
+          <div className="h-1.5 bg-gradient-to-r from-emerald-500/50 via-emerald-400/30 to-transparent" />
 
-          {/* Card header */}
+          {/* ── Card header: logo + VERIFIED badge ──────────── */}
           <div className="px-8 pt-8 pb-6 border-b border-white/8
                           flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
+              {/* Shield icon — replace with <img src="/logo.png" className="h-10" /> if needed */}
               <div className="w-14 h-14 rounded-xl bg-[#f5a62326] border border-[#f5a623]/20
                               flex items-center justify-center flex-shrink-0">
                 <ShieldCheck size={26} className="text-[#f5a623]" strokeWidth={1.75} />
               </div>
               <div>
-                {/* ★ LOGO: replace span with <img src="/logo.png" className="h-7 mb-1" /> */}
-                <span className="font-serif text-lg font-bold text-white">
+                {/* ★ LOGO: swap span with <img src="/logo.png" className="h-7 mb-1" /> */}
+                <p className="font-serif text-xl font-bold text-white leading-none mb-1">
                   Oceaniasoft<span className="text-[#f5a623]">.</span>
-                </span>
+                </p>
                 <p className="text-xs text-[#8b95a9]">Official Employment Record</p>
               </div>
             </div>
-            <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full
-                            bg-emerald-500/15 border border-emerald-500/40
-                            text-xs font-bold tracking-widest uppercase text-emerald-400">
-              <BadgeCheck size={14} strokeWidth={2.5} />
-              VERIFIED
+
+            {/* VERIFIED badge */}
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full
+                            bg-emerald-500/15 border border-emerald-500/40">
+              <BadgeCheck size={15} className="text-emerald-400" strokeWidth={2.5} />
+              <span className="text-xs font-bold tracking-widest uppercase text-emerald-400">
+                VERIFIED
+              </span>
             </div>
           </div>
 
-          {/* Card body */}
+          {/* ── Card body ────────────────────────────────────── */}
           <div className="px-8 py-8">
 
-            {/* Recipient name */}
+            {/* Recipient name + title */}
             <div className="mb-8">
-              <p className="text-xs font-semibold text-[#f5a623] uppercase tracking-widest mb-1">
+              <p className="text-xs font-semibold text-[#f5a623] uppercase tracking-widest mb-2">
                 This certifies that
               </p>
-              <h1 className="font-serif text-4xl font-bold text-white mb-2 leading-tight">
+              <h1 className="font-serif text-4xl md:text-5xl font-bold text-white leading-tight mb-3">
                 {cert.recipientName}
               </h1>
               <p className="text-lg text-[#8b95a9]">
-                {cert.credentialTitle} — {cert.credentialType}
+                {cert.credentialTitle}
               </p>
             </div>
 
-            {/* Description */}
-            <p className="text-sm text-[#8b95a9] leading-relaxed mb-6 p-4 rounded-xl
-                          bg-[#0a0e1a] border border-white/8">
-              {cert.description}
-            </p>
+            {/* Description + Responsibilities block */}
+            <div className="text-sm text-[#8b95a9] leading-relaxed mb-8 p-6
+                            rounded-xl bg-[#0a0e1a] border border-white/8">
+              <p className={cert.responsibilities.length > 0 ? "mb-4" : ""}>
+                {cert.description}
+              </p>
 
-            {/* Responsibilities */}
-            {cert.responsibilities.length > 0 && (
-              <div className="mb-6 p-4 rounded-xl bg-[#0a0e1a] border border-white/8">
-                <p className="text-xs font-semibold text-[#f5a623] uppercase tracking-widest mb-3">
-                  Key Responsibilities
-                </p>
-                <ul className="space-y-2">
-                  {cert.responsibilities.map((r, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-[#8b95a9]">
-                      <span className="text-[#f5a623] mt-1 flex-shrink-0">›</span>
-                      {r}
+              {cert.responsibilities.length > 0 && (
+                <ul className="space-y-2.5">
+                  {cert.responsibilities.map((item, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      {/* Amber bullet dot */}
+                      <span className="mt-2 w-1.5 h-1.5 rounded-full bg-[#f5a623] flex-shrink-0" />
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* Details grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-              <Detail icon={<Calendar size={15} />}  label="Issue Date"      value={cert.issueDate} />
-              <Detail icon={<Calendar size={15} />}  label="Valid Until"     value={cert.expiryDate} />
-              <Detail icon={<Briefcase size={15} />} label="Issued By"       value={cert.issuerName} />
-              <Detail icon={<User size={15} />}      label="Authorized By"   value={cert.authorizedBy} />
-              <Detail icon={<Award size={15} />}     label="Authorizer Role" value={cert.authorizerRole} />
-              <Detail icon={<Hash size={15} />}      label="Certificate ID"  value={id} mono />
+            {/* ── Details grid — 8 fields in 2 columns ────────── */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+              <DetailRow
+                icon={<Briefcase size={15} />}
+                label="Employment Type"
+                value={cert.credentialType}
+              />
+              <DetailRow
+                icon={<User size={15} />}
+                label="Department"
+                value={cert.department}
+              />
+              <DetailRow
+                icon={<Calendar size={15} />}
+                label="Joining Date"
+                value={cert.joiningDate}
+              />
+              <DetailRow
+                icon={<Calendar size={15} />}
+                label="Release Date"
+                value={cert.releaseDate}
+              />
+              <DetailRow
+                icon={<Award size={15} />}
+                label="Organization"
+                value={cert.organization}
+              />
+              <DetailRow
+                icon={<ShieldCheck size={15} />}
+                label="Employee ID"
+                value={cert.employeeId}
+              />
+              <DetailRow
+                icon={<UserCheck size={15} />}
+                label="Authorized By"
+                value={`${cert.authorizedBy}, ${cert.authorizerRole}`}
+              />
+              <DetailRow
+                icon={<FileText size={15} />}
+                label="Certificate Issue Date"
+                value={cert.certifiedOn}
+              />
             </div>
 
             {/* Skills */}
@@ -208,25 +266,28 @@ export default async function VerifyPage({
                   {cert.skills.map((s) => (
                     <span key={s}
                       className="text-xs font-medium text-[#8b95a9] bg-[#0a0e1a]
-                                 border border-white/8 px-3 py-1.5 rounded-full">
+                                 border border-white/8 px-3 py-1.5 rounded-full
+                                 hover:border-[#f5a623]/40 hover:text-[#e8ecf4] transition-colors">
                       {s}
                     </span>
                   ))}
                 </div>
               </div>
             )}
+
           </div>
         </div>
 
-        {/* Authenticity note */}
-        <div className="flex items-start gap-3 p-4 rounded-xl bg-[#f5a62315]
+        {/* ── Authenticity footer note ─────────────────────── */}
+        <div className="flex items-start gap-3 p-5 rounded-xl bg-[#f5a62312]
                         border border-[#f5a623]/20 mt-5">
           <ShieldCheck size={16} className="text-[#f5a623] flex-shrink-0 mt-0.5" strokeWidth={1.75} />
           <p className="text-xs text-[#8b95a9] leading-relaxed">
             This record was issued and is maintained by OceaniaSoft Ltd. Certificate ID{' '}
-            <span className="font-mono text-[#f5a623]">{id}</span> is unique.
-            For enquiries contact{' '}
-            <a href="mailto:hello@oceaniasoft.com" className="text-[#f5a623] hover:underline">
+            <span className="font-mono text-[#f5a623] text-[11px]">{id}</span> is unique
+            and tamper-evident. For enquiries contact{' '}
+            <a href="mailto:hello@oceaniasoft.com"
+              className="text-[#f5a623] hover:underline transition-colors">
               hello@oceaniasoft.com
             </a>
           </p>
@@ -238,18 +299,24 @@ export default async function VerifyPage({
 }
 
 // ── Detail row helper ──────────────────────────────────────────────
-function Detail({ icon, label, value, mono = false }: {
+function DetailRow({
+  icon, label, value,
+}: {
   icon: React.ReactNode;
   label: string;
   value: string;
-  mono?: boolean;
 }) {
   return (
-    <div className="flex items-start gap-3 p-3.5 rounded-xl bg-[#0a0e1a] border border-white/8">
-      <span className="text-[#f5a623] mt-0.5 flex-shrink-0">{icon}</span>
-      <div>
-        <p className="text-xs text-[#8b95a9] uppercase tracking-wide mb-0.5">{label}</p>
-        <p className={`text-sm font-medium text-white ${mono ? 'font-mono text-[#f5a623]' : ''}`}>
+    <div className="flex items-start gap-3 p-4 rounded-xl bg-[#0a0e1a] border border-white/8
+                    hover:border-[#f5a623]/20 transition-colors group">
+      <span className="text-[#f5a623] mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform">
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <p className="text-[10px] text-[#8b95a9] uppercase tracking-widest mb-1 font-medium">
+          {label}
+        </p>
+        <p className="text-sm font-medium text-[#e8ecf4] leading-snug break-words">
           {value}
         </p>
       </div>
