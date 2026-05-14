@@ -5,8 +5,8 @@ import {
   BadgeCheck, XCircle, AlertTriangle, Calendar, User, Award,
   Briefcase, ChevronRight, ArrowLeft, ShieldCheck, Star,
 } from 'lucide-react';
-import { getCertificate, formatDate, getComputedStatus } from '../../../lib/certificates';
-import type { Certificate } from '../../../lib/types';
+import { getCertificate, formatDate, getComputedStatus } from '@/lib/certificates';
+import type { Certificate } from '@/lib/types';
 
 import { Header } from '../../../components/Header';
 import { Footer } from '../../../components/Footer';

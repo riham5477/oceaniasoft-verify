@@ -37,5 +37,5 @@ export function getComputedStatus(
   if (cert.status === 'revoked') return 'revoked';
   const expiry = new Date(cert.expiryDate);
   if (expiry < new Date()) return 'expired';
-  return 'valid';
+  return 'valid';   // default to valid if status field is missing
 }

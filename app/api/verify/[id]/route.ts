@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getCertificate } from '../../../../lib/certificates';
-import type { VerifyResponse } from '../../../../lib/types';
+import { getCertificate } from '@/lib/certificates';
 
 export async function GET(
   _request: Request,
@@ -8,12 +7,13 @@ export async function GET(
 ) {
   const certificate = getCertificate(params.id);
 
-  const payload: VerifyResponse = {
-    found:       certificate !== null,
-    certificate: certificate,
-  };
-
-  return NextResponse.json(payload, {
-    status: certificate ? 200 : 404,
-  });
+  return NextResponse.json(
+    {
+      found: certificate !== null,
+      certificate: certificate,
+    },
+    {
+      status: certificate ? 200 : 404,
+    }
+  );
 }
