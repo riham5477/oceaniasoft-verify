@@ -1,16 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    // !! WARN !!
-    // This allows production builds to successfully complete even if
-    // your project has type errors.
-    // !! WARN !!
+    // This allows the build to finish even with type errors
     ignoreBuildErrors: true,
   },
-  eslint: {
-    // This ignores linting errors during builds
-    ignoreDuringBuilds: true,
-  },
+  // In Next 15, eslint is handled differently, so we just remove the block
 };
 
 export default nextConfig;
