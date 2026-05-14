@@ -2,43 +2,39 @@ import fs from 'fs';
 import path from 'path';
 import type { Certificate } from './types';
 
-// This section reads the file manually so Vercel can find it
-const getDb = () => {
-  // Use path.resolve to get an absolute path from the root
-  const filePath = path.resolve(process.cwd(), 'data/certificates.json');
-  
+const getDb = (): Certificate[] => {
   try {
+    // We use join with process.cwd() as it's the most stable for Next.js 15
+    const filePath = path.join(process.cwd(), 'data', 'certificates.json');
+    
+    if (!fs.existsSync(filePath)) {
+      console.error("File not found at:", filePath);
+      return [];
+    }
+
     const fileData = fs.readFileSync(filePath, 'utf8');
     return JSON.parse(fileData) as Certificate[];
   } catch (error) {
     console.error("Database read error:", error);
-    return []; // Return an empty array if the file is missing
+    return [];
   }
 };
 
-/**
- * Look up a certificate by its unique ID.
- * Returns the certificate if found, or null otherwise.
- */
 export function getCertificate(id: string): Certificate | null {
   const db = getDb();
-  
-  // This makes the search much more reliable
+  if (!db.length) return null;
+
   return db.find((c) => 
     c.id.trim().toLowerCase() === id.trim().toLowerCase()
   ) ?? null;
 }
 
-/**
- * Return all certificates (used in the admin panel).
- */
 export function getAllCertificates(): Certificate[] {
   return getDb();
 }
 
 /**
  * Format an ISO date string into a human-readable format.
- * e.g. "2024-03-15" → "15 March 2024"
  */
 export function formatDate(iso: string): string {
   const date = new Date(iso);
@@ -49,10 +45,6 @@ export function formatDate(iso: string): string {
   });
 }
 
-/**
- * Determine the computed status, considering real-time expiry.
- * Even if stored as "valid", return "expired" if the date has passed.
- */
 export function getComputedStatus(cert: Certificate): 'valid' | 'expired' | 'revoked' {
   if (cert.status === 'revoked') return 'revoked';
   const today = new Date();
